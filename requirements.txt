@@ -1,0 +1,16 @@
+# Core Computer Vision & Tracking
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0
+mediapipe>=0.10.9
+numpy>=1.24.0
+
+# Machine Learning & Scientific Computing
+scikit-learn>=1.3.0
+scipy>=1.11.0
+joblib>=1.3.0
+matplotlib>=3.7.0
+
+# Human-Computer Interaction & Screen Control
+pyautogui>=0.9.54
+pynput>=1.7.6
+screeninfo>=0.8.1
