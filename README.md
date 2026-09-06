@@ -28,10 +28,10 @@ By pairing active machine learning (uncertainty estimation via Gaussian Processe
 
 | Document | Description |
 |:---|:---|
-| 📖 [**COMPREHENSIVE_SYSTEM_DOCUMENTATION.md**](docs/COMPREHENSIVE_SYSTEM_DOCUMENTATION.md) | In-depth technical walkthrough, mathematical formulations, and engineering rationale. |
-| 📊 [**EVALUATION_REPORT.md**](docs/EVALUATION_REPORT.md) | Multi-model benchmark analysis, LOOCV results, and Conventional vs. Adaptive calibration study. |
-| 🛠️ [**API_REFERENCE.md**](docs/API_REFERENCE.md) | Complete developer reference of all classes, methods, parameters, and return types. |
-| 🗺️ [**GUIDE.md**](docs/GUIDE.md) | Step-by-step milestone roadmap and engineering reference manual. |
+| [**COMPREHENSIVE_SYSTEM_DOCUMENTATION.md**](docs/COMPREHENSIVE_SYSTEM_DOCUMENTATION.md) | In-depth technical walkthrough, mathematical formulations, and engineering rationale. |
+| [**EVALUATION_REPORT.md**](docs/EVALUATION_REPORT.md) | Multi-model benchmark analysis, LOOCV results, and Conventional vs. Adaptive calibration study. |
+| [**API_REFERENCE.md**](docs/API_REFERENCE.md) | Complete developer reference of all classes, methods, parameters, and return types. |
+| [**GUIDE.md**](docs/GUIDE.md) | Step-by-step milestone roadmap and engineering reference manual. |
 
 ---
 
@@ -113,16 +113,16 @@ The OCULAR pipeline operates across five conceptual layers:
 
 | Milestone | Description | Status | Core File |
 |:---|:---|:---:|:---|
-| **M1** | Cross-Platform Camera Capture | ✅ Complete | [`src/ocular/camera.py`](src/ocular/camera.py) |
-| **M2** | MediaPipe Face & Iris Tracking | ✅ Complete | [`src/ocular/tracker.py`](src/ocular/tracker.py) |
-| **M3** | 11-D Feature Vector & solvePnP Head Pose | ✅ Complete | [`src/ocular/features.py`](src/ocular/features.py) |
-| **M4** | Interactive Full-Screen Calibration UI | ✅ Complete | [`src/ocular/calibration.py`](src/ocular/calibration.py) |
-| **M5** | Multi-Model Gaze Regression (Ridge, SVR, RF, MLP) | ✅ Complete | [`src/ocular/gaze.py`](src/ocular/gaze.py) |
-| **M6** | Adaptive Active Calibration & Online SGD | ✅ Complete | [`src/ocular/adaptive.py`](src/ocular/adaptive.py) |
-| **M7** | Robustness Benchmarks & Metric Conversions | ✅ Complete | [`src/ocular/evaluation.py`](src/ocular/evaluation.py) |
-| **M8** | 1€ Signal Filter, GazeCursor, Dwell, Scroller | ✅ Complete | [`src/ocular/interaction.py`](src/ocular/interaction.py) |
-| **M9** | Quantitative Evaluation Framework | ✅ Complete | [`experiments/compare_models.py`](experiments/compare_models.py) |
-| **M10** | OS Abstraction, Packaging, & Unified CLI | ✅ Complete | [`src/ocular/main.py`](src/ocular/main.py) |
+| **M1** | Cross-Platform Camera Capture | Complete | [`src/ocular/camera.py`](src/ocular/camera.py) |
+| **M2** | MediaPipe Face & Iris Tracking | Complete | [`src/ocular/tracker.py`](src/ocular/tracker.py) |
+| **M3** | 11-D Feature Vector & solvePnP Head Pose | Complete | [`src/ocular/features.py`](src/ocular/features.py) |
+| **M4** | Interactive Full-Screen Calibration UI | Complete | [`src/ocular/calibration.py`](src/ocular/calibration.py) |
+| **M5** | Multi-Model Gaze Regression (Ridge, SVR, RF, MLP) | Complete | [`src/ocular/gaze.py`](src/ocular/gaze.py) |
+| **M6** | Adaptive Active Calibration & Online SGD | Complete | [`src/ocular/adaptive.py`](src/ocular/adaptive.py) |
+| **M7** | Robustness Benchmarks & Metric Conversions | Complete | [`src/ocular/evaluation.py`](src/ocular/evaluation.py) |
+| **M8** | 1€ Signal Filter, GazeCursor, Dwell, Scroller | Complete | [`src/ocular/interaction.py`](src/ocular/interaction.py) |
+| **M9** | Quantitative Evaluation Framework | Complete | [`experiments/compare_models.py`](experiments/compare_models.py) |
+| **M10** | OS Abstraction, Packaging, & Unified CLI | Complete | [`src/ocular/main.py`](src/ocular/main.py) |
 
 ---
 
