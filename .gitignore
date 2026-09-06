@@ -1,29 +1,61 @@
 # Virtual environment
 .venv/
+env/
+venv/
 
-# Python
+# Python byte-code & build artifacts
 __pycache__/
 *.py[cod]
+*$py.class
 *.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Testing / coverage
+# Testing & code coverage
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.nox/
 
-# IDE / editor
+# IDE & Editor settings
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# OS
+# Operating System artifacts
 .DS_Store
+Thumbs.db
 
-# Project data
+# User Calibration Sessions & Experiment Outputs
+calibration/*.npz
+!calibration/.gitkeep
 data/raw/
 data/processed/
-
-# Logs
 *.log
 
-# Environment / secrets
+# Trained model weights and downloaded task bundles (preserve base ONNX models)
+models/*.joblib
+models/*.task
+!models/*.onnx
+
+# Environment & credentials
 .env
+.env.local
+.env.production
+!.env.example

@@ -1,6 +1,7 @@
 import cv2
 import time
 from camera import Camera
+from pupil import find_pupil
 
 camera = Camera("/dev/video0")
 
@@ -110,6 +111,39 @@ while frames < 100:
                 (0, 255, 0),
                 2
             )
+
+            left_eye = frame[
+                eye_y:eye_y + eye_h,
+                left_x:left_x + left_w
+            ]
+
+            right_eye = frame[
+                eye_y:eye_y + eye_h,
+                right_x:right_x + right_w
+            ]
+
+            left_pupil = find_pupil(left_eye)
+            right_pupil = find_pupil(right_eye)
+
+            if left_pupil is not None:
+                px, py, radius = left_pupil
+                cv2.circle(
+                    left_eye,
+                    (px, py),
+                    radius,
+                    (0, 0, 255),
+                    2
+                )
+
+            if right_pupil is not None:
+                px, py, radius = right_pupil
+                cv2.circle(
+                    right_eye,
+                    (px, py),
+                    radius,
+                    (0, 0, 255),
+                    2
+                )
 
     # -------------------------
     # Display

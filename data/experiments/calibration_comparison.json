@@ -1,0 +1,23 @@
+{
+  "conventional": {
+    "samples": 9,
+    "duration_seconds": 18.0,
+    "mean_error_px": 603.1332822566217,
+    "median_error_px": 707.252993022348,
+    "p95_error_px": 829.889697626703,
+    "mean_error_deg": 15.508440459462097
+  },
+  "adaptive": {
+    "samples": 6,
+    "duration_seconds": 12.0,
+    "mean_error_px": 969.8821277706212,
+    "median_error_px": 1184.2714685360245,
+    "p95_error_px": 1249.2968328298705,
+    "mean_error_deg": 24.04705611823142
+  },
+  "tradeoff_analysis": {
+    "sample_reduction_ratio": 0.33333333333333337,
+    "time_reduction_ratio": 0.33333333333333337,
+    "accuracy_difference_px": 366.7488455139995
+  }
+}
