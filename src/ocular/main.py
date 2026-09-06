@@ -119,8 +119,10 @@ def run_stream(args):
 
 
 def run_calibrate(args):
-    """Run interactive calibration routine."""
-    print(f"[+] Launching Calibration Session ({args.pattern})...")
+    """Run interactive calibration routine (conventional or adaptive)."""
+    adaptive = getattr(args, "adaptive", False)
+    mode_label = "Adaptive" if adaptive else f"Conventional {args.pattern}"
+    print(f"[+] Launching Calibration Session ({mode_label})...")
     screen_w, screen_h = CalibrationSession.get_screen_resolution()
 
     cam = Camera(args.camera)
@@ -132,16 +134,66 @@ def run_calibrate(args):
     extractor = FeatureExtractor()
     session = CalibrationSession(screen_w, screen_h)
 
-    pts = session.generate_grid(screen_w, screen_h, args.pattern)
-    print(f"[+] Total Targets to Calibrate: {len(pts)}")
+    if adaptive:
+        # --- Adaptive Calibration Mode ---
+        engine = AdaptiveCalibrationEngine(screen_w, screen_h, strategy="hybrid")
+        seed_pts = session.generate_grid(screen_w, screen_h, "5-point")
+        print(f"[+] Phase 1: Seed calibration with {len(seed_pts)} points...")
 
-    X, y = session.run_interactive(
-        cam,
-        tracker,
-        extractor,
-        points=pts,
-        dwell_seconds=args.dwell,
-    )
+        X_seed, y_seed = session.run_interactive(
+            cam, tracker, extractor, points=seed_pts, dwell_seconds=args.dwell,
+        )
+
+        if X_seed is None or len(X_seed) < 3:
+            print("[!] Insufficient seed data. Calibration aborted.")
+            cam.release()
+            tracker.release()
+            return
+
+        X_all = list(X_seed)
+        y_all = [list(pt) for pt in y_seed]
+        max_budget = 12
+        pool = engine.generate_candidate_pool(grid_rows=5, grid_cols=5)
+
+        print(f"[+] Phase 2: Active sampling (budget={max_budget})...")
+        while len(y_all) < max_budget:
+            current_reg = GazeRegressor("ridge", screen_w, screen_h)
+            current_reg.fit(np.array(X_all), np.array(y_all))
+            loocv = current_reg.evaluate_loocv(np.array(X_all), np.array(y_all))
+
+            should_stop, reason = engine.should_stop(
+                loocv["point_errors_px"], len(y_all), max_budget, target_mae_px=50.0
+            )
+            if should_stop:
+                print(f"    -> Adaptive stop: {reason}")
+                break
+
+            next_target = engine.select_next_target(
+                y_all, np.array(X_all), current_reg, pool
+            )
+            print(f"    -> Sampling point {len(y_all)+1}: {next_target}")
+
+            X_new, y_new = session.run_interactive(
+                cam, tracker, extractor, points=[next_target], dwell_seconds=args.dwell,
+            )
+            if X_new is not None and len(X_new) > 0:
+                X_all.append(X_new[0])
+                y_all.append(list(y_new[0]))
+            else:
+                print("    -> Point skipped (no valid data).")
+
+        X = np.array(X_all, dtype=np.float64)
+        y = np.array(y_all, dtype=np.float64)
+        print(f"[+] Adaptive calibration complete: {len(X)} points collected.")
+
+    else:
+        # --- Conventional Fixed-Grid Calibration ---
+        pts = session.generate_grid(screen_w, screen_h, args.pattern)
+        print(f"[+] Total Targets to Calibrate: {len(pts)}")
+
+        X, y = session.run_interactive(
+            cam, tracker, extractor, points=pts, dwell_seconds=args.dwell,
+        )
 
     cam.release()
     tracker.release()
@@ -154,7 +206,8 @@ def run_calibrate(args):
 
         os.makedirs(os.path.dirname(out_file) or ".", exist_ok=True)
         metadata = {
-            "pattern": args.pattern,
+            "pattern": args.pattern if not adaptive else "adaptive",
+            "adaptive": adaptive,
             "screen_w": screen_w,
             "screen_h": screen_h,
             "timestamp": time.time(),
@@ -172,6 +225,7 @@ def run_calibrate(args):
         print(f"95th Percentile Error: {metrics['p95_error_px']:.1f} px")
     else:
         print("[!] Calibration aborted or insufficient data collected.")
+
 
 
 def run_train(args):
@@ -324,6 +378,7 @@ def main():
     p_calib.add_argument("--dwell", type=float, default=1.8, help="Dwell fixation duration per target in seconds")
     p_calib.add_argument("--session", "-s", default=None, help="Calibration session name (saves to calibration/<session>.npz)")
     p_calib.add_argument("--output", "-o", default="calibration/session_default.npz", help="Output calibration path")
+    p_calib.add_argument("--adaptive", action="store_true", help="Use adaptive active-learning calibration instead of fixed grid")
 
     # 3. Train
     p_train = subparsers.add_parser("train", help="Train gaze regression model from calibration session")
