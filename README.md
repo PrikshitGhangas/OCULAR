@@ -169,6 +169,7 @@ OCULAR/
 ├── pyproject.toml                               # Package setup & entry points
 ├── requirements.txt                             # Production dependencies
 ├── .gitignore                                   # Version control exclusion rules
+├── .env.example                                 # Environment configuration template
 │
 ├── archive/                                     # Legacy and prototype scripts
 │   ├── pupil.py
@@ -198,6 +199,7 @@ OCULAR/
 ├── src/                                         # Core framework source code
 │   └── ocular/
 │       ├── __init__.py                          # Public package exports
+│       ├── __main__.py                          # python -m ocular entry point
 │       ├── camera.py                            # Layer 1: Camera acquisition
 │       ├── tracker.py                           # Layer 2: MediaPipe face/iris tracking
 │       ├── features.py                          # Layer 3: Feature extraction & solvePnP
@@ -210,14 +212,17 @@ OCULAR/
 │       ├── evaluation.py                        # Performance metrics & benchmarks
 │       └── main.py                              # Unified CLI entrypoint
 │
-└── tests/                                       # 17 unit and integration tests
+└── tests/                                       # 41 unit and integration tests
     ├── __init__.py
-    ├── test_tracker.py
+    ├── test_blink.py
+    ├── test_calibration.py
+    ├── test_camera.py
+    ├── test_evaluation.py
     ├── test_features.py
     ├── test_filters.py
     ├── test_gaze.py
-    ├── test_calibration.py
-    └── test_interaction.py
+    ├── test_interaction.py
+    └── test_tracker.py
 ```
 
 ---

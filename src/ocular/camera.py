@@ -43,7 +43,7 @@ class Camera:
             bool: True if camera opened successfully, False otherwise.
         """
         # Linux V4L2 optimization (disable dynamic exposure framerate drops)
-        if self.system == "Linux" and isinstance(self.source, str):
+        if self.system == "Linux" and isinstance(self.source, str) and self.source.startswith("/dev/"):
             if shutil.which("v4l2-ctl"):
                 try:
                     subprocess.run(

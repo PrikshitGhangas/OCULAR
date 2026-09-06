@@ -117,17 +117,13 @@ class AdaptiveCalibrationEngine:
 
     def _select_by_regional_error(self, candidates, existing_targets, regressor):
         """
-        Select candidate nearest to regions exhibiting maximum cross-validation residual error.
+        Select candidate nearest to regions exhibiting maximum spatial dispersion
+        from existing calibrated points.
         """
         if len(existing_targets) < 3 or not regressor.is_trained:
             return candidates[0]
 
-        eval_res = regressor.evaluate_loocv(regressor.model_x.named_steps["scaler"].fit_transform(
-            # Use point errors from LOOCV
-            np.zeros((len(existing_targets), 11))
-        ), existing_targets) if False else None
-
-        # Fallback to spatial dispersion if direct residuals unavailable
+        # Select the candidate farthest from all existing calibrated points
         scores = []
         for pt in candidates:
             pt_arr = np.array(pt)

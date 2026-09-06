@@ -48,6 +48,39 @@ class TestGazeRegressor(unittest.TestCase):
             pred = reg.predict(self.X[0])
             self.assertEqual(len(pred), 2)
 
+    def test_predict_without_training_raises(self):
+        reg = GazeRegressor("ridge", screen_w=1920, screen_h=1080)
+        with self.assertRaises(RuntimeError):
+            reg.predict(self.X[0])
+
+    def test_fit_with_too_few_samples_raises(self):
+        reg = GazeRegressor("ridge", screen_w=1920, screen_h=1080)
+        with self.assertRaises(ValueError):
+            reg.fit(self.X[:2], self.y[:2])
+
+    def test_save_and_load_roundtrip(self):
+        import tempfile
+        reg = GazeRegressor("ridge", screen_w=1920, screen_h=1080)
+        reg.fit(self.X, self.y)
+        pred_before = reg.predict(self.X[0])
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            reg.save(tmpdir)
+            reg2 = GazeRegressor("ridge", screen_w=1920, screen_h=1080)
+            reg2.load(tmpdir)
+            pred_after = reg2.predict(self.X[0])
+
+        np.testing.assert_array_almost_equal(pred_before, pred_after, decimal=5)
+
+    def test_pixels_to_degrees(self):
+        deg = GazeRegressor.pixels_to_degrees(100.0)
+        self.assertGreater(deg, 0)
+        self.assertLess(deg, 10)
+
+    def test_unsupported_model_raises(self):
+        with self.assertRaises(ValueError):
+            GazeRegressor("nonexistent_model", screen_w=1920, screen_h=1080)
+
 
 if __name__ == "__main__":
     unittest.main()

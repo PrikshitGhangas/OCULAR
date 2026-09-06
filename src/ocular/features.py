@@ -124,12 +124,20 @@ class FeatureExtractor:
         eye_h = np.linalg.norm(bottom - top)
 
         if eye_w > 1.0:
-            h_ratio = float((iris[0] - outer[0]) / (inner[0] - outer[0]))
+            h_denom = inner[0] - outer[0]
+            if abs(h_denom) > 1e-3:
+                h_ratio = float((iris[0] - outer[0]) / h_denom)
+            else:
+                h_ratio = 0.5
         else:
             h_ratio = 0.5
 
         if eye_h > 1.0:
-            v_ratio = float((iris[1] - top[1]) / (bottom[1] - top[1]))
+            v_denom = bottom[1] - top[1]
+            if abs(v_denom) > 1e-3:
+                v_ratio = float((iris[1] - top[1]) / v_denom)
+            else:
+                v_ratio = 0.5
         else:
             v_ratio = 0.5
 

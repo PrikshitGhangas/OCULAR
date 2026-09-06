@@ -147,7 +147,12 @@ def run_calibrate(args):
     tracker.release()
 
     if X is not None and len(X) > 0:
-        out_file = args.output
+        if getattr(args, "session", None):
+            out_file = args.session if args.session.endswith(".npz") else os.path.join("calibration", f"{args.session}.npz")
+        else:
+            out_file = args.output
+
+        os.makedirs(os.path.dirname(out_file) or ".", exist_ok=True)
         metadata = {
             "pattern": args.pattern,
             "screen_w": screen_w,
@@ -171,8 +176,17 @@ def run_calibrate(args):
 
 def run_train(args):
     """Train gaze regression model from saved calibration session."""
-    print(f"[+] Training Gaze Regressor from {args.input} (Model: {args.model})...")
-    X, y, meta = CalibrationSession.load_session(args.input)
+    in_file = args.input
+    if getattr(args, "session", None):
+        in_file = args.session if args.session.endswith(".npz") else os.path.join("calibration", f"{args.session}.npz")
+
+    if not os.path.exists(in_file):
+        print(f"[ERROR] Calibration session file not found: {in_file}")
+        print("[i] Please run 'ocular calibrate' first to collect calibration data.")
+        return
+
+    print(f"[+] Training Gaze Regressor from {in_file} (Model: {args.model})...")
+    X, y, meta = CalibrationSession.load_session(in_file)
 
     screen_w = meta.get("screen_w", 1920)
     screen_h = meta.get("screen_h", 1080)
@@ -187,6 +201,9 @@ def run_train(args):
     print(f"P95 Error: {metrics['p95_error_px']:.1f} px")
 
     reg.save(args.output_dir)
+    if getattr(args, "session", None):
+        session_model_dir = os.path.join(args.output_dir, args.session)
+        reg.save(session_model_dir)
     print(f"[SUCCESS] Trained model saved to: {args.output_dir}")
 
 
@@ -195,12 +212,18 @@ def run_interact(args):
     print("[+] Initializing Real-Time Gaze Interaction...")
     screen_w, screen_h = CalibrationSession.get_screen_resolution()
 
+    model_dir = args.model_dir
+    if getattr(args, "session", None):
+        candidate_dir = os.path.join(args.model_dir, args.session)
+        if os.path.exists(candidate_dir):
+            model_dir = candidate_dir
+
     reg = GazeRegressor(args.model, screen_w, screen_h)
     try:
-        reg.load(args.model_dir)
-        print(f"[+] Loaded trained {args.model.upper()} model.")
+        reg.load(model_dir)
+        print(f"[+] Loaded trained {args.model.upper()} model from {model_dir}.")
     except Exception as e:
-        print(f"[ERROR] Could not load model from {args.model_dir}: {e}")
+        print(f"[ERROR] Could not load model from {model_dir}: {e}")
         print("[i] Please run calibration and training first.")
         return
 
@@ -212,7 +235,8 @@ def run_interact(args):
     tracker = FaceTracker()
     extractor = FeatureExtractor()
     blink_det = BlinkDetector()
-    controller = InteractionController(screen_w, screen_h, enable_os_cursor=args.enable_os_cursor)
+    enable_os = args.enable_os_cursor or (getattr(args, "mode", "all") == "cursor")
+    controller = InteractionController(screen_w, screen_h, enable_os_cursor=enable_os)
 
     print("[+] Interaction Loop active. Press 'q' to exit.")
 
@@ -291,26 +315,30 @@ def main():
 
     # 1. Stream
     p_stream = subparsers.add_parser("stream", help="Live facial & iris tracking diagnostic stream")
-    p_stream.add_argument("--camera", default="/dev/video0", help="Camera device index or path")
+    p_stream.add_argument("--camera", default="0", help="Camera device index or path")
 
     # 2. Calibrate
     p_calib = subparsers.add_parser("calibrate", help="Execute visual calibration session")
-    p_calib.add_argument("--camera", default="/dev/video0", help="Camera device index or path")
+    p_calib.add_argument("--camera", default="0", help="Camera device index or path")
     p_calib.add_argument("--pattern", default="9-point", choices=["5-point", "9-point", "13-point", "16-point"])
     p_calib.add_argument("--dwell", type=float, default=1.8, help="Dwell fixation duration per target in seconds")
-    p_calib.add_argument("--output", default="calibration/session_default.npz", help="Output calibration path")
+    p_calib.add_argument("--session", "-s", default=None, help="Calibration session name (saves to calibration/<session>.npz)")
+    p_calib.add_argument("--output", "-o", default="calibration/session_default.npz", help="Output calibration path")
 
     # 3. Train
     p_train = subparsers.add_parser("train", help="Train gaze regression model from calibration session")
-    p_train.add_argument("--input", default="calibration/session_default.npz", help="Input calibration file")
-    p_train.add_argument("--model", default="ridge", choices=["ridge", "svr", "rf", "mlp"])
+    p_train.add_argument("--session", "-s", default=None, help="Calibration session name (loads calibration/<session>.npz)")
+    p_train.add_argument("--input", "-i", default="calibration/session_default.npz", help="Input calibration file")
+    p_train.add_argument("--model", "-m", default="rf", choices=["ridge", "svr", "rf", "mlp"], help="Regression model type")
     p_train.add_argument("--output-dir", default="models", help="Directory to save trained model")
 
     # 4. Interact
     p_interact = subparsers.add_parser("interact", help="Launch live gaze interaction (cursor, dwell, scroll)")
-    p_interact.add_argument("--camera", default="/dev/video0", help="Camera device index or path")
-    p_interact.add_argument("--model", default="ridge", choices=["ridge", "svr", "rf", "mlp"])
+    p_interact.add_argument("--camera", default="0", help="Camera device index or path")
+    p_interact.add_argument("--session", "-s", default=None, help="Calibration session name to load model from")
+    p_interact.add_argument("--model", "-m", default="rf", choices=["ridge", "svr", "rf", "mlp"], help="Regression model type")
     p_interact.add_argument("--model-dir", default="models", help="Directory containing trained model")
+    p_interact.add_argument("--mode", default="all", choices=["all", "cursor", "dwell", "scroll"], help="Interaction mode focus")
     p_interact.add_argument("--enable-os-cursor", action="store_true", help="Control physical OS mouse cursor")
 
     # 5. Benchmark

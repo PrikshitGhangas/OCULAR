@@ -56,4 +56,6 @@ models/*.task
 
 # Environment & credentials
 .env
-.env.*
+.env.local
+.env.production
+!.env.example

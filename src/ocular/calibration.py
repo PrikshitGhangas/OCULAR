@@ -218,7 +218,7 @@ class CalibrationSession:
         """
         Load calibration dataset from compressed .npz archive.
         """
-        data = np.load(filepath)
+        data = np.load(filepath, allow_pickle=False)
         X = data["X"]
         y = data["y"]
         metadata = json.loads(str(data["metadata"])) if "metadata" in data else {}

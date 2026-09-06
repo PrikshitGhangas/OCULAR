@@ -211,15 +211,28 @@ class GazeRegressor:
         joblib.dump(config, os.path.join(directory, f"gaze_config_{self.model_type}.joblib"))
 
     def load(self, directory="models"):
-        """Load trained models from directory."""
-        config = joblib.load(os.path.join(directory, f"gaze_config_{self.model_type}.joblib"))
+        """Load trained models from directory.
+
+        WARNING: This uses joblib/pickle deserialization. Only load model files
+        from trusted sources, as malicious files could execute arbitrary code.
+        """
+        config_path = os.path.join(directory, f"gaze_config_{self.model_type}.joblib")
+        if not os.path.exists(config_path):
+            raise FileNotFoundError(f"Model config not found: {config_path}")
+
+        config = joblib.load(config_path)
+        if not isinstance(config, dict) or "screen_w" not in config or "screen_h" not in config:
+            raise ValueError(f"Invalid model config format in {config_path}")
+
         self.screen_w = config["screen_w"]
         self.screen_h = config["screen_h"]
 
-        self.model_x = joblib.load(
-            os.path.join(directory, f"gaze_model_x_{self.model_type}.joblib")
-        )
-        self.model_y = joblib.load(
-            os.path.join(directory, f"gaze_model_y_{self.model_type}.joblib")
-        )
+        model_x_path = os.path.join(directory, f"gaze_model_x_{self.model_type}.joblib")
+        model_y_path = os.path.join(directory, f"gaze_model_y_{self.model_type}.joblib")
+
+        if not os.path.exists(model_x_path) or not os.path.exists(model_y_path):
+            raise FileNotFoundError(f"Model files not found in {directory}")
+
+        self.model_x = joblib.load(model_x_path)
+        self.model_y = joblib.load(model_y_path)
         self.is_trained = True
