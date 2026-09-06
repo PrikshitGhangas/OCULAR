@@ -11,6 +11,7 @@ from .features import FeatureExtractor
 from .filters import ExponentialMovingAverage, OneEuroFilter, PointFilter2D, SimpleMovingAverage
 from .gaze import GazeRegressor
 from .interaction import DwellDetector, GazeCursor, GazeScroller, InteractionController
+from .profiler import PerformanceProfiler
 from .tracker import FaceTracker
 
 __version__ = "1.0.0"
@@ -32,5 +33,6 @@ __all__ = [
     "DwellDetector",
     "GazeScroller",
     "InteractionController",
+    "PerformanceProfiler",
     "EvaluationFramework",
 ]
