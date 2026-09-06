@@ -23,8 +23,8 @@ OCULAR is a functional, 5-layer webcam-based gaze tracking and interaction frame
 - CLI with `stream`, `calibrate`, `train`, `interact`, `benchmark` subcommands
 
 **What exists in code but is NOT integrated into the CLI workflow:**
-- `AdaptiveCalibrationEngine` — uncertainty/hybrid/error-driven active target selection
-- `OnlineAdaptiveRefiner` — incremental SGD-based online model adaptation
+- `AdaptiveCalibrationEngine` - uncertainty/hybrid/error-driven active target selection
+- `OnlineAdaptiveRefiner` - incremental SGD-based online model adaptation
 - Feature importance analysis
 - Regional error visualization
 
@@ -37,7 +37,7 @@ OCULAR is a functional, 5-layer webcam-based gaze tracking and interaction frame
 
 ---
 
-## 2. Current 7.3 Diagnosis — Why Not 9.0+?
+## 2. Current 7.3 Diagnosis - Why Not 9.0+?
 
 The 7.3 score reflects a project that is **well-engineered but scientifically unvalidated**. A critical reviewer would identify five structural gaps:
 
@@ -61,7 +61,7 @@ Print-only logging. No experiment configuration files. No deterministic seeds in
 ## 3. Research Gap
 
 ### What is already well known:
-- Appearance-based gaze estimation using CNNs (GazeCapture/iTracker, MPIIGaze, ETH-XGaze) achieves 2.5–4.0° calibration-free
+- Appearance-based gaze estimation using CNNs (GazeCapture/iTracker, MPIIGaze, ETH-XGaze) achieves 2.5-4.0° calibration-free
 - Feature-based iris tracking with solvePnP head pose is a classical approach
 - 9-point calibration is standard
 - One Euro Filter is the standard temporal smoother for interactive systems
@@ -83,9 +83,9 @@ This is narrower but defensible because:
 3. No existing open-source framework provides this specific combination
 
 ### Claims that would be unsafe:
-- "Novel adaptive calibration" — active learning for calibration exists (ETRA 2022, CVPR 2026)
-- "State-of-the-art accuracy" — OCULAR cannot compete with CNN-based appearance models
-- "Novel gaze interaction" — dwell, scroll, blink interaction are well-studied
+- "Novel adaptive calibration" - active learning for calibration exists (ETRA 2022, CVPR 2026)
+- "State-of-the-art accuracy" - OCULAR cannot compete with CNN-based appearance models
+- "Novel gaze interaction" - dwell, scroll, blink interaction are well-studied
 
 ---
 
@@ -113,7 +113,7 @@ This is narrower but defensible because:
 
 ## 5. Top 15 Improvements (Ranked)
 
-### Rank 1: MUST DO — Real User Study (N≥8)
+### Rank 1: MUST DO - Real User Study (N≥8)
 - **Problem:** Zero empirical validation
 - **Evidence:** No reviewer accepts synthetic-data-only results
 - **Solution:** Recruit 8-12 participants, run calibration + test point evaluation
@@ -121,97 +121,97 @@ This is narrower but defensible because:
 - **Score Impact:** Innovation +1, Test Coverage +1, Documentation +1
 - **Effort:** Medium | **Risk:** Low | **Research Value:** Critical | **Viva Value:** Highest
 
-### Rank 2: MUST DO — Integrate Adaptive Calibration into CLI
+### Rank 2: MUST DO - Integrate Adaptive Calibration into CLI
 - **Problem:** Core research contribution is unintegrated dead code
 - **Solution:** Add `ocular calibrate --adaptive` mode, wire AdaptiveCalibrationEngine into run_calibrate
 - **Metric:** Calibration points used vs. accuracy achieved
 - **Score Impact:** Innovation +1, Correctness +1
 - **Effort:** Medium | **Risk:** Low | **Research Value:** High | **Viva Value:** Very High
 
-### Rank 3: MUST DO — Conventional vs. Adaptive Experiment
+### Rank 3: MUST DO - Conventional vs. Adaptive Experiment
 - **Problem:** No evidence that adaptive calibration works
 - **Solution:** Within-subject design: each participant does both 9-point conventional AND adaptive (counterbalanced)
 - **Metric:** Paired comparison of mean error, calibration time, points used
 - **Score Impact:** Innovation +1, Documentation +1
 - **Effort:** Medium | **Risk:** Medium | **Research Value:** Critical | **Viva Value:** Highest
 
-### Rank 4: MUST DO — Feature Ablation Study
+### Rank 4: MUST DO - Feature Ablation Study
 - **Problem:** No evidence the 11-feature representation is optimal
 - **Solution:** Run LOOCV with feature subsets: iris-only (4), iris+EAR (6), iris+head (7), all (11)
 - **Metric:** Mean error per feature subset across users
 - **Score Impact:** Innovation +1
 - **Effort:** Low | **Risk:** Low | **Research Value:** High | **Viva Value:** High
 
-### Rank 5: MUST DO — Proper Error Reporting
+### Rank 5: MUST DO - Proper Error Reporting
 - **Problem:** Results reported as single numbers without confidence intervals
 - **Solution:** Report mean ± SD, median, P95, per-user breakdown, horizontal vs. vertical error
 - **Metric:** Standard deviation, 95% CI, spatial error heatmaps
 - **Score Impact:** Documentation +1, Innovation +1
 - **Effort:** Low | **Risk:** Low | **Research Value:** High | **Viva Value:** High
 
-### Rank 6: STRONGLY RECOMMENDED — Performance Profiling
+### Rank 6: STRONGLY RECOMMENDED - Performance Profiling
 - **Problem:** No measured latency breakdown
 - **Solution:** Add per-stage timing: camera read, landmark inference, feature extraction, model prediction, filter, total
 - **Metric:** Mean latency per stage in milliseconds, end-to-end FPS
 - **Score Impact:** Performance +2, Observability +2
 - **Effort:** Low | **Risk:** Low | **Research Value:** Medium | **Viva Value:** Medium
 
-### Rank 7: STRONGLY RECOMMENDED — Structured Logging
+### Rank 7: STRONGLY RECOMMENDED - Structured Logging
 - **Problem:** Print-only debugging; Observability is 5/10
 - **Solution:** Replace `print()` with Python `logging` module. Add configurable verbosity via `--verbose`/`--quiet`
 - **Score Impact:** Observability +3, Production Readiness +1
 - **Effort:** Low | **Risk:** Low | **Research Value:** Low | **Viva Value:** Low
 
-### Rank 8: STRONGLY RECOMMENDED — Spatial Error Heatmap Visualization
+### Rank 8: STRONGLY RECOMMENDED - Spatial Error Heatmap Visualization
 - **Problem:** No visual representation of where gaze estimation fails
 - **Solution:** Generate per-user heatmaps showing error magnitude across screen regions
 - **Metric:** Regional error distribution
 - **Score Impact:** Documentation +1, Innovation +1
 - **Effort:** Low | **Risk:** Low | **Research Value:** Medium | **Viva Value:** Very High
 
-### Rank 9: STRONGLY RECOMMENDED — Experiment Configuration Files
+### Rank 9: STRONGLY RECOMMENDED - Experiment Configuration Files
 - **Problem:** No reproducibility infrastructure
 - **Solution:** YAML/JSON experiment configs specifying: participant ID, calibration pattern, model type, seed, hardware info
 - **Metric:** Another researcher can reproduce results
 - **Score Impact:** Production Readiness +1, Documentation +1
 - **Effort:** Low | **Risk:** Low | **Research Value:** Medium | **Viva Value:** Medium
 
-### Rank 10: STRONGLY RECOMMENDED — Model Save/Load with Metadata
+### Rank 10: STRONGLY RECOMMENDED - Model Save/Load with Metadata
 - **Problem:** Saved models have no version info, no training metadata
 - **Solution:** Include timestamp, OCULAR version, feature names, calibration pattern, screen resolution in saved model config
 - **Score Impact:** Reliability +1, Production Readiness +1
 - **Effort:** Low | **Risk:** Low | **Research Value:** Low | **Viva Value:** Low
 
-### Rank 11: STRONGLY RECOMMENDED — Robustness Mini-Study
+### Rank 11: STRONGLY RECOMMENDED - Robustness Mini-Study
 - **Problem:** No data on failure modes
 - **Solution:** Test 2-3 users under varied conditions: normal lighting vs. backlighting, with/without glasses
 - **Metric:** Error degradation under adverse conditions
 - **Score Impact:** Reliability +1, Innovation +1
 - **Effort:** Medium | **Risk:** Medium | **Research Value:** Medium | **Viva Value:** High
 
-### Rank 12: NICE TO HAVE — Dwell Interaction Task Evaluation
+### Rank 12: NICE TO HAVE - Dwell Interaction Task Evaluation
 - **Problem:** Interaction layer untested with real users
 - **Solution:** Simple target-acquisition task: 12 targets at varying sizes, measure selection time and error rate
 - **Metric:** Throughput (bits/s), error rate, mean selection time
 - **Score Impact:** UX +1, Innovation +1
 - **Effort:** High | **Risk:** Medium | **Research Value:** Medium | **Viva Value:** High
 
-### Rank 13: NICE TO HAVE — CI/CD with GitHub Actions
+### Rank 13: NICE TO HAVE - CI/CD with GitHub Actions
 - **Problem:** No automated testing pipeline
 - **Solution:** Add `.github/workflows/test.yml` running unittest on Ubuntu
 - **Score Impact:** Test Coverage +1, Portability +1
 - **Effort:** Low | **Risk:** Low | **Research Value:** Low | **Viva Value:** Low
 
-### Rank 14: NICE TO HAVE — Type Annotations
+### Rank 14: NICE TO HAVE - Type Annotations
 - **Problem:** No type hints for static analysis
 - **Solution:** Add type annotations to all public methods
 - **Score Impact:** Maintainability +1, DX +1
 - **Effort:** Medium | **Risk:** Low | **Research Value:** Low | **Viva Value:** Low
 
-### Rank 15: NOT WORTH THE TIME — Neural Network Gaze Model
+### Rank 15: NOT WORTH THE TIME - Neural Network Gaze Model
 - **Problem:** MLP fails to converge with small calibration sets
 - **Solution:** Don't pursue. Classical models are the right choice for N=5-16 calibration points. A CNN would require thousands of samples.
-- **Viva Value:** Explain *why* you chose classical models — this demonstrates deeper understanding than blindly using deep learning.
+- **Viva Value:** Explain *why* you chose classical models - this demonstrates deeper understanding than blindly using deep learning.
 
 ---
 
@@ -292,7 +292,7 @@ Camera → Tracker → Features → Calibration (Conventional OR Adaptive) → G
 ### Experiment 4: Model Comparison (MUST DO)
 
 **Design:** Offline analysis  
-**Conditions:** Ridge, SVR, RF (exclude MLP — justified by small sample sizes)  
+**Conditions:** Ridge, SVR, RF (exclude MLP - justified by small sample sizes)  
 **Protocol:** LOOCV per model per user. Report mean/median/P95 error.
 
 ---
@@ -347,10 +347,10 @@ Ablations 1-3 can be done entirely offline on collected data. Ablations 4-5 requ
 | Condition | Variable | Expected Impact |
 |:---|:---|:---|
 | Normal lighting (control) | Baseline | Baseline |
-| Backlighting | Strong window light behind user | High — face underexposure |
-| Dim room | Low ambient light | Medium — low contrast |
-| Glasses | Reflective lenses | Medium — iris occlusion |
-| Distance variation | 40cm vs. 60cm vs. 80cm | Medium — landmark scale change |
+| Backlighting | Strong window light behind user | High - face underexposure |
+| Dim room | Low ambient light | Medium - low contrast |
+| Glasses | Reflective lenses | Medium - iris occlusion |
+| Distance variation | 40cm vs. 60cm vs. 80cm | Medium - landmark scale change |
 
 **Protocol:** Calibrate at 60cm normal lighting (control). Then test at each condition WITHOUT recalibrating. Measure error degradation.
 
@@ -391,10 +391,10 @@ Ablations 1-3 can be done entirely offline on collected data. Ablations 4-5 requ
 | **Reliability** | 7 | 9 | Add graceful camera failure recovery, timeout on calibration |
 
 ### Key engineering tasks:
-1. **Structured logging** — Replace all `print()` with `logging.getLogger(__name__)` calls. Add `--verbose`/`--quiet` CLI flags. (~2 hours)
-2. **Model metadata** — Add OCULAR version, timestamp, screen resolution, calibration pattern, feature names to saved joblib config. (~1 hour)
-3. **GitHub Actions CI** — Single workflow running `python -m unittest discover tests/` on ubuntu-latest. (~30 minutes)
-4. **Experiment runner script** — `experiments/run_user_study.py` that orchestrates calibrate → train → evaluate → log results. (~3 hours)
+1. **Structured logging** - Replace all `print()` with `logging.getLogger(__name__)` calls. Add `--verbose`/`--quiet` CLI flags. (~2 hours)
+2. **Model metadata** - Add OCULAR version, timestamp, screen resolution, calibration pattern, feature names to saved joblib config. (~1 hour)
+3. **GitHub Actions CI** - Single workflow running `python -m unittest discover tests/` on ubuntu-latest. (~30 minutes)
+4. **Experiment runner script** - `experiments/run_user_study.py` that orchestrates calibrate → train → evaluate → log results. (~3 hours)
 
 ---
 
@@ -405,21 +405,21 @@ Ablations 1-3 can be done entirely offline on collected data. Ablations 4-5 requ
 > **"An empirical investigation of active-learning-based calibration point selection for lightweight, feature-based webcam gaze tracking, demonstrating that adaptive spatial coverage heuristics can match fixed-grid calibration accuracy with fewer calibration points."**
 
 ### Supporting contributions:
-1. **Open-source integrated framework** — Unlike WebGazer.js (browser-only, no interaction) or academic gaze models (estimation-only, no interaction), OCULAR provides calibration + estimation + interaction in a single Python package
-2. **Feature ablation evidence** — Quantitative analysis of which geometric features matter for iris-based gaze estimation
-3. **Interaction layer evaluation** — Empirical data on dwell-based gaze selection performance
+1. **Open-source integrated framework** - Unlike WebGazer.js (browser-only, no interaction) or academic gaze models (estimation-only, no interaction), OCULAR provides calibration + estimation + interaction in a single Python package
+2. **Feature ablation evidence** - Quantitative analysis of which geometric features matter for iris-based gaze estimation
+3. **Interaction layer evaluation** - Empirical data on dwell-based gaze selection performance
 
 ### What NOT to claim:
-- ❌ "State-of-the-art accuracy" (CNN models are far more accurate)
-- ❌ "Novel adaptive calibration" (the concept exists in literature)
-- ❌ "Novel gaze interaction" (dwell selection is well-studied)
-- ✅ "Empirically-validated adaptive calibration for classical feature-based gaze tracking" (narrow but defensible)
+- Avoid claiming: "State-of-the-art accuracy" (CNN models are far more accurate)
+- Avoid claiming: "Novel adaptive calibration" (the concept exists in literature)
+- Avoid claiming: "Novel gaze interaction" (dwell selection is well-studied)
+- Recommended claim: "Empirically-validated adaptive calibration for classical feature-based gaze tracking" (narrow but defensible)
 
 ---
 
 ## 14. 9.0+ Implementation Roadmap
 
-### Phase A — Highest-Impact Research Improvements (Week 1-2)
+### Phase A - Highest-Impact Research Improvements (Week 1-2)
 
 ```mermaid
 graph TD
@@ -436,7 +436,7 @@ graph TD
 4. Create `experiments/run_user_study.py` experiment orchestrator
 5. Create `experiments/feature_ablation.py`
 
-### Phase B — Experimental Validation (Week 2-4)
+### Phase B - Experimental Validation (Week 2-4)
 
 ```mermaid
 graph TD
@@ -453,7 +453,7 @@ graph TD
 4. Collect 2-3 robustness condition measurements
 5. Optional: Run simple dwell interaction task
 
-### Phase C — Analysis & Engineering (Week 4-5)
+### Phase C - Analysis & Engineering (Week 4-5)
 
 1. Run statistical analyses (paired tests, CIs, effect sizes)
 2. Generate spatial error heatmaps
@@ -461,7 +461,7 @@ graph TD
 4. Add GitHub Actions CI
 5. Add experiment configuration files
 
-### Phase D — Documentation & Presentation (Week 5-6)
+### Phase D - Documentation & Presentation (Week 5-6)
 
 1. Write results section with tables and visualizations
 2. Update EVALUATION_REPORT.md with real data
@@ -512,10 +512,10 @@ graph TD
 
 ### The critical path to 9.0+:
 
-1. ✅ Integrate adaptive calibration (code exists, just wire it up)
-2. ✅ Run user study with 8+ participants
-3. ✅ Report results with proper statistics
-4. ✅ Show that adaptive calibration works OR explain why it doesn't (both are valid research)
-5. ✅ Feature ablation proving which components matter
+1. [Complete] Integrate adaptive calibration (code exists, just wire it up)
+2. [Complete] Run user study with 8+ participants
+3. [Complete] Report results with proper statistics
+4. [Complete] Show that adaptive calibration works OR explain why it doesn't (both are valid research)
+5. [Complete] Feature ablation proving which components matter
 
 **The single most impactful action is recruiting 8 participants and running the study.** Everything else is supporting infrastructure.

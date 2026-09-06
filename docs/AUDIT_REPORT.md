@@ -2,7 +2,7 @@
 
 > **Audit Date:** 2026-09-06  
 > **Auditor:** Antigravity Engineering  
-> **Project:** OCULAR — Real-Time Ocular Tracking and Gaze-Aware Interaction Framework  
+> **Project:** OCULAR - Real-Time Ocular Tracking and Gaze-Aware Interaction Framework  
 > **Audit Scope:** Full 10-Phase audit per [auditor.md](file:///home/prykshift/OCULAR/auditor.md)
 
 ---
@@ -67,19 +67,19 @@ OCULAR is a webcam-based gaze tracking and interaction framework built in Python
 
 ## 4. Complete Findings Report
 
-### P0 — Catastrophic (None Found)
+### P0 - Catastrophic (None Found)
 
 No data loss, crash-on-startup, or security-critical vulnerabilities that would expose user data.
 
-### P1 — Major
+### P1 - Major
 
 | # | Category | File | Finding | Status |
 |:---:|:---|:---|:---|:---:|
-| 1 | Security | [gaze.py](file:///home/prykshift/OCULAR/src/ocular/gaze.py) | `joblib.load()` uses pickle — arbitrary code execution from malicious model files | **FIXED** (validation + warning) |
+| 1 | Security | [gaze.py](file:///home/prykshift/OCULAR/src/ocular/gaze.py) | `joblib.load()` uses pickle - arbitrary code execution from malicious model files | **FIXED** (validation + warning) |
 | 2 | Portability | [main.py](file:///home/prykshift/OCULAR/src/ocular/main.py) | Hardcoded `/dev/video0` default camera fails on Windows/macOS | **FIXED** (default `0`) |
 | 3 | Correctness | [features.py](file:///home/prykshift/OCULAR/src/ocular/features.py) | Division by zero when iris landmark X-coords collapse | **FIXED** (safe denominator check) |
 
-### P2 — Important
+### P2 - Important
 
 | # | Category | File | Finding | Status |
 |:---:|:---|:---|:---|:---:|
@@ -90,7 +90,7 @@ No data loss, crash-on-startup, or security-critical vulnerabilities that would 
 | 8 | Correctness | [adaptive.py](file:///home/prykshift/OCULAR/src/ocular/adaptive.py) | Dead `if False else None` code in `_select_by_regional_error` | **FIXED** |
 | 9 | DX | [pyproject.toml](file:///home/prykshift/OCULAR/pyproject.toml) | pytest configured but not listed as dependency | **FIXED** (optional-dependencies) |
 
-### P3 — Improvement
+### P3 - Improvement
 
 | # | Category | File | Finding | Status |
 |:---:|:---|:---|:---|:---:|
@@ -98,9 +98,9 @@ No data loss, crash-on-startup, or security-critical vulnerabilities that would 
 | 11 | Reliability | [tracker.py](file:///home/prykshift/OCULAR/src/ocular/tracker.py) | No context manager protocol for resource cleanup | **FIXED** (`__enter__`/`__exit__`) |
 | 12 | Portability | [.gitignore](file:///home/prykshift/OCULAR/.gitignore) | `.env.*` glob excludes `.env.example` | **FIXED** |
 | 13 | Documentation | [README.md](file:///home/prykshift/OCULAR/README.md) | Directory tree shows 17 tests, missing new files | **FIXED** |
-| 14 | DX | src/ocular/ | No `__main__.py` — `python -m ocular` doesn't work | **FIXED** |
+| 14 | DX | src/ocular/ | No `__main__.py` - `python -m ocular` doesn't work | **FIXED** |
 
-### P4 — Polish (Noted, Not Fixed)
+### P4 - Polish (Noted, Not Fixed)
 
 | # | Category | Finding | Rationale |
 |:---:|:---|:---|:---|
@@ -134,10 +134,10 @@ No data loss, crash-on-startup, or security-critical vulnerabilities that would 
 
 | Severity | Finding | Mitigation |
 |:---|:---|:---|
-| **Medium** | `joblib.load()` uses pickle internally — loading a malicious `.joblib` file enables arbitrary code execution | Added validation of loaded config structure. Added security warning in docstring. **Residual risk**: inherent to scikit-learn's model persistence. Users must only load trusted model files. |
+| **Medium** | `joblib.load()` uses pickle internally - loading a malicious `.joblib` file enables arbitrary code execution | Added validation of loaded config structure. Added security warning in docstring. **Residual risk**: inherent to scikit-learn's model persistence. Users must only load trusted model files. |
 | **Low** | `np.load()` could theoretically execute pickle if attacker crafts `.npz` with pickle objects | Enforced `allow_pickle=False` |
 | **Low** | Subprocess call passes user-provided path to `v4l2-ctl` | Added `/dev/` prefix validation |
-| **Info** | No authentication/authorization (expected for local desktop app) | N/A — appropriate for use case |
+| **Info** | No authentication/authorization (expected for local desktop app) | N/A - appropriate for use case |
 
 ---
 
@@ -160,7 +160,7 @@ No data loss, crash-on-startup, or security-critical vulnerabilities that would 
 | `pyautogui` for cursor control | All | Already wrapped in `try/except` |
 | `cv2.CAP_V4L2` / `cv2.CAP_DSHOW` | All | Platform-specific backend with `CAP_ANY` fallback |
 
-**Cross-Platform Status**: ✅ Linux (validated), ⚠️ Windows (code-reviewed, not runtime-tested), ⚠️ macOS (code-reviewed, not runtime-tested)
+**Cross-Platform Status**: Yes Linux (validated), Review Windows (code-reviewed, not runtime-tested), Review macOS (code-reviewed, not runtime-tested)
 
 ---
 
@@ -172,16 +172,16 @@ No data loss, crash-on-startup, or security-critical vulnerabilities that would 
 | **Test Files** | 6 | 9 |
 | **Modules with Tests** | 6/12 | 9/12 |
 | **Edge Case Tests** | 0 | 7 |
-| **Save/Load Roundtrip** | ❌ | ✅ |
+| **Save/Load Roundtrip** | No | Yes |
 | **Error Path Tests** | 0 | 3 |
 
 **New Test Files Created:**
-- [test_camera.py](file:///home/prykshift/OCULAR/tests/test_camera.py) — 7 tests
-- [test_blink.py](file:///home/prykshift/OCULAR/tests/test_blink.py) — 8 tests
-- [test_evaluation.py](file:///home/prykshift/OCULAR/tests/test_evaluation.py) — 4 tests
+- [test_camera.py](file:///home/prykshift/OCULAR/tests/test_camera.py) - 7 tests
+- [test_blink.py](file:///home/prykshift/OCULAR/tests/test_blink.py) - 8 tests
+- [test_evaluation.py](file:///home/prykshift/OCULAR/tests/test_evaluation.py) - 4 tests
 
 **New Tests Added to Existing Files:**
-- [test_gaze.py](file:///home/prykshift/OCULAR/tests/test_gaze.py) — 5 new edge case tests
+- [test_gaze.py](file:///home/prykshift/OCULAR/tests/test_gaze.py) - 5 new edge case tests
 
 ---
 
@@ -195,10 +195,10 @@ No data loss, crash-on-startup, or security-critical vulnerabilities that would 
 
 ## 11. Remaining Risks
 
-1. **joblib/pickle deserialization** remains inherently unsafe — this is an scikit-learn ecosystem limitation. Mitigated with validation and warnings.
+1. **joblib/pickle deserialization** remains inherently unsafe - this is an scikit-learn ecosystem limitation. Mitigated with validation and warnings.
 2. **Interactive calibration** cannot be automatically tested (requires real camera + display). Manual testing required.
 3. **Windows/macOS runtime testing** was not performed (code review only).
-4. **No structured logging** — print-only debugging will be difficult for end users to report issues.
+4. **No structured logging** - print-only debugging will be difficult for end users to report issues.
 
 ---
 
@@ -294,9 +294,9 @@ $ ocular interact --help     # Subcommand verified
 
 | Platform | Status | Notes |
 |:---|:---:|:---|
-| **Linux** | ✅ Validated | Full runtime testing performed on Arch Linux |
-| **Windows** | ⚠️ Code-Reviewed | Camera defaults fixed. DirectShow backend configured. pyautogui cross-platform. |
-| **macOS** | ⚠️ Code-Reviewed | CAP_ANY fallback. screeninfo has macOS support. |
+| **Linux** | Validated | Full runtime testing performed on Arch Linux |
+| **Windows** | Code-Reviewed | Camera defaults fixed. DirectShow backend configured. pyautogui cross-platform. |
+| **macOS** | Code-Reviewed | CAP_ANY fallback. screeninfo has macOS support. |
 
 ---
 

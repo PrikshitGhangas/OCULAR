@@ -1,4 +1,4 @@
-# OCULAR — Comprehensive Implementation Guide
+# OCULAR: Comprehensive Implementation Guide
 
 > **Purpose:** A step-by-step technical guide for building the OCULAR webcam-based
 > gaze tracking and interaction system, from the current M1 state through to the
@@ -9,20 +9,20 @@
 # TABLE OF CONTENTS
 
 1. [Prerequisites & Dependencies](#1-prerequisites--dependencies)
-2. [M1 — Webcam Pipeline (COMPLETED)](#2-m1--webcam-pipeline-completed)
-3. [M2 — Face Detection & Eye/Iris Tracking](#3-m2--face-detection--eyeiris-tracking)
-4. [M3 — Feature Extraction](#4-m3--feature-extraction)
-5. [M4 — Calibration System](#5-m4--calibration-system)
-6. [M5 — Gaze Regression](#6-m5--gaze-regression)
-7. [M6 — Adaptive Calibration](#7-m6--adaptive-calibration)
-8. [M7 — Robustness Testing](#8-m7--robustness-testing)
-9. [M8 — Interaction Mechanisms](#9-m8--interaction-mechanisms)
-10. [M9 — Evaluation Framework](#10-m9--evaluation-framework)
-11. [M10 — Windows Deployment](#11-m10--windows-deployment)
-12. [Appendix A — Face Detection Method Comparison](#appendix-a--face-detection-method-comparison)
-13. [Appendix B — Complete Landmark Reference](#appendix-b--complete-landmark-reference)
-14. [Appendix C — Mathematical Formulas](#appendix-c--mathematical-formulas)
-15. [Appendix D — Recommended File Structure](#appendix-d--recommended-file-structure)
+2. [M1: Webcam Pipeline (COMPLETED)](#2-m1--webcam-pipeline-completed)
+3. [M2: Face Detection & Eye/Iris Tracking](#3-m2--face-detection--eyeiris-tracking)
+4. [M3: Feature Extraction](#4-m3--feature-extraction)
+5. [M4: Calibration System](#5-m4--calibration-system)
+6. [M5: Gaze Regression](#6-m5--gaze-regression)
+7. [M6: Adaptive Calibration](#7-m6--adaptive-calibration)
+8. [M7: Robustness Testing](#8-m7--robustness-testing)
+9. [M8: Interaction Mechanisms](#9-m8--interaction-mechanisms)
+10. [M9: Evaluation Framework](#10-m9--evaluation-framework)
+11. [M10: Windows Deployment](#11-m10--windows-deployment)
+12. [Appendix A: Face Detection Method Comparison](#appendix-a--face-detection-method-comparison)
+13. [Appendix B: Complete Landmark Reference](#appendix-b--complete-landmark-reference)
+14. [Appendix C: Mathematical Formulas](#appendix-c--mathematical-formulas)
+15. [Appendix D: Recommended File Structure](#appendix-d--recommended-file-structure)
 
 ---
 
@@ -72,7 +72,7 @@ others when their milestone arrives.
 
 ---
 
-# 2. M1 — Webcam Pipeline (COMPLETED)
+# 2. M1: Webcam Pipeline (COMPLETED)
 
 This milestone is already complete. The current implementation includes:
 
@@ -84,11 +84,11 @@ This milestone is already complete. The current implementation includes:
 ### What to verify before moving on
 
 ```text
-✓ Camera opens successfully
-✓ Frames are read at expected resolution
-✓ Live display works via cv2.imshow
-✓ Camera releases cleanly on exit
-✓ FPS is approximately 28 at 1280×720
+[x] Camera opens successfully
+[x] Frames are read at expected resolution
+[x] Live display works via cv2.imshow
+[x] Camera releases cleanly on exit
+[x] FPS is approximately 28 at 1280×720
 ```
 
 ### Known issue to keep in mind
@@ -100,7 +100,7 @@ cross-platform.
 
 ---
 
-# 3. M2 — Face Detection & Eye/Iris Tracking
+# 3. M2: Face Detection & Eye/Iris Tracking
 
 This is the **next major milestone** and the most critical decision point.
 
@@ -111,35 +111,35 @@ Three options were researched. Here is the recommendation:
 | Feature | YuNet | MediaPipe Face Mesh | dlib (68-point) |
 |---------|-------|---------------------|-----------------|
 | **Landmarks** | 5 | 478 (with iris) | 68 |
-| **Iris Detection** | ❌ | ✅ Direct | ❌ |
-| **Speed (CPU)** | ~2-5ms ⚡ | ~10-30ms | ~35-60ms |
+| **Iris Detection** | No | Direct | No |
+| **Speed (CPU)** | ~2-5ms  | ~10-30ms | ~35-60ms |
 | **Eye Contour** | Center only | Full contour | 6 points/eye |
-| **3D Coordinates** | ❌ | ✅ | ❌ |
+| **3D Coordinates** | No | Yes | No |
 | **Install** | Built into OpenCV | `pip install mediapipe` | Needs C++ compiler |
-| **Windows Support** | ✅ | ✅ | ✅ |
+| **Windows Support** | Yes | Yes | Yes |
 
-### ✅ RECOMMENDATION: MediaPipe Face Mesh
+### Recommendation: MediaPipe Face Mesh
 
 **Why:**
 
 1. **Iris landmarks are essential.** MediaPipe provides direct iris center
-   coordinates (landmarks 468, 473) — no custom CV needed.
+   coordinates (landmarks 468, 473): no custom CV needed.
 2. **478 landmarks** give rich eye contour, face geometry, and head pose data.
 3. **3D coordinates** are included for every landmark.
-4. **Cross-platform** — works on Linux and Windows without code changes.
+4. **Cross-platform**: works on Linux and Windows without code changes.
 5. **~10-30ms** is fast enough for real-time at 30 FPS.
 
 **Keep YuNet** as a fallback and for performance comparison experiments.
 
 ## 3.2 Step-by-Step: Integrating MediaPipe
 
-### Step 1 — Install MediaPipe
+### Step 1: Install MediaPipe
 
 ```bash
 pip install mediapipe
 ```
 
-### Step 2 — Create the Tracker Module
+### Step 2: Create the Tracker Module
 
 Create `src/ocular/tracker.py`:
 
@@ -261,7 +261,7 @@ class FaceTracker:
         self.face_mesh.close()
 ```
 
-### Step 3 — Create a Test Script
+### Step 3: Create a Test Script
 
 Create `src/ocular/trackerTest.py`:
 
@@ -325,29 +325,29 @@ print(f"Total time: {elapsed:.3f} s")
 print(f"FPS: {frames / elapsed:.1f}")
 ```
 
-### Step 4 — Verify the Tracker
+### Step 4: Verify the Tracker
 
 Run the test and confirm:
 
 ```text
-✓ Green dots appear on both iris centers
-✓ Yellow dots appear on eye corners
-✓ Tracking is stable and follows eye movement
-✓ FPS remains above 20
-✓ Landmarks track correctly when head moves
+[x] Green dots appear on both iris centers
+[x] Yellow dots appear on eye corners
+[x] Tracking is stable and follows eye movement
+[x] FPS remains above 20
+[x] Landmarks track correctly when head moves
 ```
 
-### Step 5 — Investigate the Existing "Red Circles" Issue
+### Step 5: Investigate the Existing "Red Circles" Issue
 
 The README mentions "two red circles appearing and disappearing." Now that you
 have the tracker, check if this comes from the existing `eyeTest.py` contour-
 based pupil detection (`pupil.py`). Compare MediaPipe's iris tracking stability
-against the contour approach — this will help justify the framework choice in
+against the contour approach: this will help justify the framework choice in
 your report.
 
 ---
 
-# 4. M3 — Feature Extraction
+# 4. M3: Feature Extraction
 
 Once the tracker is stable, build a feature extraction pipeline that converts
 raw landmarks into numerical features suitable for regression.
@@ -358,14 +358,14 @@ The recommended feature vector contains **11 features**:
 
 | # | Feature | Range | Description |
 |---|---------|-------|-------------|
-| 1 | `left_iris_h_ratio` | 0.0 – 1.0 | Left iris horizontal position between eye corners |
-| 2 | `left_iris_v_ratio` | 0.0 – 1.0 | Left iris vertical position between eyelids |
-| 3 | `right_iris_h_ratio` | 0.0 – 1.0 | Right iris horizontal position |
-| 4 | `right_iris_v_ratio` | 0.0 – 1.0 | Right iris vertical position |
-| 5 | `left_ear` | 0.0 – 0.5 | Left Eye Aspect Ratio (openness) |
-| 6 | `right_ear` | 0.0 – 0.5 | Right Eye Aspect Ratio (openness) |
-| 7 | `left_eye_aspect` | ~1.0 – 5.0 | Left eye width / height |
-| 8 | `right_eye_aspect` | ~1.0 – 5.0 | Right eye width / height |
+| 1 | `left_iris_h_ratio` | 0.0 - 1.0 | Left iris horizontal position between eye corners |
+| 2 | `left_iris_v_ratio` | 0.0 - 1.0 | Left iris vertical position between eyelids |
+| 3 | `right_iris_h_ratio` | 0.0 - 1.0 | Right iris horizontal position |
+| 4 | `right_iris_v_ratio` | 0.0 - 1.0 | Right iris vertical position |
+| 5 | `left_ear` | 0.0 - 0.5 | Left Eye Aspect Ratio (openness) |
+| 6 | `right_ear` | 0.0 - 0.5 | Right Eye Aspect Ratio (openness) |
+| 7 | `left_eye_aspect` | ~1.0 - 5.0 | Left eye width / height |
+| 8 | `right_eye_aspect` | ~1.0 - 5.0 | Right eye width / height |
 | 9 | `head_pitch` | degrees | Head tilt up/down |
 | 10 | `head_yaw` | degrees | Head turn left/right |
 | 11 | `head_roll` | degrees | Head tilt sideways |
@@ -406,7 +406,7 @@ Used for blink detection and as a feature for the gaze model.
 EAR = (||p2 - p6|| + ||p3 - p5||) / (2 × ||p1 - p4||)
 ```
 
-- **Open eye:** EAR ≈ 0.20 – 0.35
+- **Open eye:** EAR ≈ 0.20 - 0.35
 - **Closed/blink:** EAR < 0.20
 
 ## 4.4 Head Pose Estimation (solvePnP)
@@ -485,7 +485,7 @@ def estimate_head_pose(landmarks, frame_shape):
 
 ## 4.5 Step-by-Step: Building the Feature Extractor
 
-### Step 1 — Create `src/ocular/features.py`
+### Step 1: Create `src/ocular/features.py`
 
 ```python
 import cv2
@@ -673,12 +673,12 @@ class FeatureExtractor:
         return euler[0][0], euler[1][0], euler[2][0]
 ```
 
-### Step 2 — Test Feature Extraction
+### Step 2: Test Feature Extraction
 
 Create a quick test that prints feature values in real time to verify they
 change sensibly when you move your eyes and head.
 
-### Step 3 — Log Features to CSV
+### Step 3: Log Features to CSV
 
 Before moving to calibration, log features to a CSV file so you can inspect
 and visualize the data:
@@ -696,22 +696,22 @@ with open('data/feature_log.csv', 'w', newline='') as f:
         writer.writerow(features.tolist())
 ```
 
-### Step 4 — Verify Feature Behavior
+### Step 4: Verify Feature Behavior
 
 Check that:
 
 ```text
-✓ Iris h_ratio changes when you look left/right
-✓ Iris v_ratio changes when you look up/down
-✓ Both eyes' ratios move roughly together
-✓ EAR drops dramatically during blinks
-✓ Head pose angles change correctly with head movement
-✓ Features are stable (not wildly jittery) when holding still
+[x] Iris h_ratio changes when you look left/right
+[x] Iris v_ratio changes when you look up/down
+[x] Both eyes' ratios move roughly together
+[x] EAR drops dramatically during blinks
+[x] Head pose angles change correctly with head movement
+[x] Features are stable (not wildly jittery) when holding still
 ```
 
 ---
 
-# 5. M4 — Calibration System
+# 5. M4: Calibration System
 
 Calibration collects paired data: **(features, known_screen_position)**.
 
@@ -756,8 +756,8 @@ def generate_calibration_grid(screen_w, screen_h, rows=3, cols=3,
 For each calibration point:
     1. Display a target dot/circle at the known screen position.
     2. Animate it (e.g., shrinking circle) to cue fixation.
-    3. Wait 1–2 seconds for the user to fixate.
-    4. Capture 15–30 frames of features during the latter half
+    3. Wait 1-2 seconds for the user to fixate.
+    4. Capture 15-30 frames of features during the latter half
        of the dwell (to avoid saccade noise).
     5. Filter out blink frames (EAR < 0.2).
     6. Average the remaining feature vectors.
@@ -861,7 +861,7 @@ def run_calibration(screen_w, screen_h, points, camera, tracker,
 
 ---
 
-# 6. M5 — Gaze Regression
+# 6. M5: Gaze Regression
 
 ## 6.1 The Regression Task
 
@@ -870,7 +870,7 @@ Input:  Feature vector (11 features)
 Output: Screen coordinates (X, Y)
 ```
 
-Train **separate models** for X and Y predictions — this often works better
+Train **separate models** for X and Y predictions: this often works better
 because horizontal and vertical gaze depend on different feature subsets.
 
 ## 6.2 Model Progression (Simple → Complex)
@@ -897,9 +897,9 @@ model_y = Pipeline([
     ('ridge', Ridge(alpha=1.0)),
 ])
 
-# X_train: shape (N, 11)  — feature vectors
-# y_train_x: shape (N,)   — screen X coordinates
-# y_train_y: shape (N,)   — screen Y coordinates
+# X_train: shape (N, 11) : feature vectors
+# y_train_x: shape (N,)  : screen X coordinates
+# y_train_y: shape (N,)  : screen Y coordinates
 
 model_x.fit(X_train, y_train_x)
 model_y.fit(X_train, y_train_y)
@@ -910,7 +910,7 @@ pred_y = model_y.predict(X_new)
 ```
 
 **Why start here:** Ridge with polynomial features handles non-linearity while
-preventing overfitting with limited calibration data (9–16 points). This is
+preventing overfitting with limited calibration data (9-16 points). This is
 likely good enough for a usable system.
 
 ### Level 2: SVR (Support Vector Regression)
@@ -940,7 +940,7 @@ model_x = RandomForestRegressor(
 )
 ```
 
-**Bonus:** Provides `feature_importances_` — useful for understanding which
+**Bonus:** Provides `feature_importances_`: useful for understanding which
 features matter most.
 
 ### Level 4: Small MLP (Only If Justified)
@@ -970,7 +970,7 @@ multiple samples each) and the simpler models plateau.
 
 ### Leave-One-Out Cross-Validation (During Calibration)
 
-With only 9–16 calibration points, use LOOCV:
+With only 9-16 calibration points, use LOOCV:
 
 ```python
 from sklearn.model_selection import LeaveOneOut
@@ -1003,7 +1003,7 @@ print(f"95th percentile: {np.percentile(errors, 95):.1f} px")
 | Mean error (px) | Overall average accuracy |
 | Median error (px) | Typical accuracy (ignores outliers) |
 | 95th percentile (px) | Worst-case behavior |
-| Error in degrees | Physical angle — gold standard for research |
+| Error in degrees | Physical angle: gold standard for research |
 
 ### Converting Pixels to Degrees
 
@@ -1036,7 +1036,7 @@ model_y = joblib.load('models/gaze_model_y.pkl')
 
 ---
 
-# 7. M6 — Adaptive Calibration
+# 7. M6: Adaptive Calibration
 
 This is the **primary research contribution** of OCULAR.
 
@@ -1231,7 +1231,7 @@ model_x.partial_fit(X_new_sample, y_x_new_sample)
 
 ---
 
-# 8. M7 — Robustness Testing
+# 8. M7: Robustness Testing
 
 ## 8.1 Test Conditions
 
@@ -1242,7 +1242,7 @@ Test the system under varying conditions to measure degradation:
 | **Lighting** | Bright overhead, dim room, backlit (window behind user), side-lit |
 | **Head position** | Centered, leaned left, leaned right, leaned forward, leaned back |
 | **Distance** | 40cm, 60cm (normal), 80cm from camera |
-| **Users** | At least 3–5 different people |
+| **Users** | At least 3-5 different people |
 | **Glasses** | With and without glasses/contacts |
 
 ## 8.2 Test Protocol
@@ -1250,7 +1250,7 @@ Test the system under varying conditions to measure degradation:
 For each condition:
 
 1. Calibrate the system under that condition.
-2. Display 9–16 test points (different from calibration points).
+2. Display 9-16 test points (different from calibration points).
 3. Record predicted vs actual positions.
 4. Compute error metrics.
 5. Compare against the baseline (normal lighting, normal distance, centered).
@@ -1274,17 +1274,17 @@ experiment = {
 
 ---
 
-# 9. M8 — Interaction Mechanisms
+# 9. M8: Interaction Mechanisms
 
 ## 9.1 Temporal Filtering (REQUIRED Before Any Interaction)
 
 Raw gaze estimates are noisy. You **must** filter before using gaze for
 interaction.
 
-### ✅ RECOMMENDED: One Euro Filter (1€ Filter)
+### Recommendation: One Euro Filter (1€ Filter)
 
 Specifically designed for noisy HCI input. Adapts its cutoff frequency based on
-movement speed — low jitter when still, low lag when moving.
+movement speed: low jitter when still, low lag when moving.
 
 ```python
 import math
@@ -1436,7 +1436,7 @@ class DwellDetector:
                          (gaze_y - self.dwell_center[1])**2)
 
         if dist > self.radius_px:
-            # Gaze moved — reset
+            # Gaze moved: reset
             self.dwell_center = (gaze_x, gaze_y)
             self.dwell_start = current_time_ms
             return False, 0.0
@@ -1470,12 +1470,12 @@ def gaze_scroll(gaze_y, screen_h, scroll_zone=0.2, max_speed=5):
     bottom_threshold = screen_h * (1 - scroll_zone)
 
     if gaze_y < top_threshold:
-        # Looking near top — scroll up
+        # Looking near top: scroll up
         speed = int(max_speed * (1 - gaze_y / top_threshold))
         pyautogui.scroll(speed)
 
     elif gaze_y > bottom_threshold:
-        # Looking near bottom — scroll down
+        # Looking near bottom: scroll down
         speed = int(max_speed *
                     (gaze_y - bottom_threshold) /
                     (screen_h - bottom_threshold))
@@ -1504,7 +1504,7 @@ class BlinkDetector:
         """
         if avg_ear < self.ear_threshold:
             self.closed_count += 1
-            return 'none'  # Still closed — wait
+            return 'none'  # Still closed: wait
 
         # Eye just opened
         result = 'none'
@@ -1523,11 +1523,11 @@ The **Midas Touch problem**: everything you look at gets activated.
 
 ### Mitigation Strategies
 
-1. **Dwell threshold:** Don't activate instantly — require sustained gaze
-   (500–1000ms).
+1. **Dwell threshold:** Don't activate instantly: require sustained gaze
+   (500-1000ms).
 2. **Spatial stability:** Require low variance in gaze position before
    starting dwell timer.
-3. **Cooldown:** After activation, ignore input for 500–1000ms.
+3. **Cooldown:** After activation, ignore input for 500-1000ms.
 4. **Confidence threshold:** Only process frames where face detection
    confidence > 0.8.
 5. **Two-step activation:** Dwell to select, then deliberate blink to
@@ -1537,7 +1537,7 @@ The **Midas Touch problem**: everything you look at gets activated.
 
 ---
 
-# 10. M9 — Evaluation Framework
+# 10. M9: Evaluation Framework
 
 ## 10.1 Evaluation Categories
 
@@ -1548,7 +1548,7 @@ The **Midas Touch problem**: everything you look at gets activated.
 | Mean error (px) | Average Euclidean distance between predicted and actual |
 | Median error (px) | Middle-value error (robust to outliers) |
 | 95th percentile (px) | Worst-case error |
-| Mean error (degrees) | Physical angle — research standard |
+| Mean error (degrees) | Physical angle: research standard |
 
 ### B. Calibration
 
@@ -1607,7 +1607,7 @@ The **Midas Touch problem**: everything you look at gets activated.
 3. Highlight one button as the target.
 4. User must select it via dwell.
 5. Record: success/failure, time to select, false activations.
-6. Repeat for 20–30 trials.
+6. Repeat for 20-30 trials.
 ```
 
 ### Conventional vs Adaptive Calibration Comparison
@@ -1615,12 +1615,12 @@ The **Midas Touch problem**: everything you look at gets activated.
 ```text
 Within-subject design (same user does both):
 
-Session A — Conventional:
+Session A: Conventional:
   - 9-point fixed grid calibration
   - Gaze accuracy test
   - Interaction test
 
-Session B — Adaptive:
+Session B: Adaptive:
   - 5-point initial + up to 4 adaptive points
   - Same gaze accuracy test
   - Same interaction test
@@ -1665,7 +1665,7 @@ experiment_results = {
 
 ---
 
-# 11. M10 — Windows Deployment
+# 11. M10: Windows Deployment
 
 ## 11.1 Platform Abstraction
 
@@ -1719,24 +1719,24 @@ pyinstaller --onefile --windowed src/ocular/main.py
 
 ---
 
-# Appendix A — Face Detection Method Comparison
+# Appendix A: Face Detection Method Comparison
 
 | Feature | YuNet | MediaPipe Face Mesh | dlib (68-point) |
 |---------|-------|---------------------|-----------------|
 | **Total Landmarks** | 5 | 478 (with iris) | 68 |
-| **Iris Detection** | ❌ No | ✅ Yes (10 points) | ❌ No |
+| **Iris Detection** | No | Yes (10 points) | No |
 | **Eye Contour** | 1 center point | Full detailed contour | 6 points per eye |
-| **3D Coordinates** | ❌ 2D only | ✅ x, y, z | ❌ 2D only |
-| **Speed (CPU)** | ~2-5ms ⚡ | ~10-30ms | ~35-60ms |
+| **3D Coordinates** | 2D only | x, y, z | 2D only |
+| **Speed (CPU)** | ~2-5ms  | ~10-30ms | ~35-60ms |
 | **Model Size** | ~230KB | ~2-4MB | ~100MB |
 | **Install** | Built into OpenCV | `pip install mediapipe` | Needs CMake + C++ |
 | **Head Pose Data** | 5 points (basic PnP) | Rich 3D mesh | 68 points (good PnP) |
-| **Blink Detection** | ❌ | ✅ (via EAR) | ✅ (via EAR) |
-| **Best For** | Fast face detection | **Full gaze pipeline** ✅ | EAR / eye shape analysis |
+| **Blink Detection** | No | Yes (via EAR) | Yes (via EAR) |
+| **Best For** | Fast face detection | **Full gaze pipeline** | EAR / eye shape analysis |
 
 ---
 
-# Appendix B — Complete Landmark Reference
+# Appendix B: Complete Landmark Reference
 
 ## MediaPipe Iris Landmarks (refine_landmarks=True)
 
@@ -1786,7 +1786,7 @@ pyinstaller --onefile --windowed src/ocular/main.py
 
 ---
 
-# Appendix C — Mathematical Formulas
+# Appendix C: Mathematical Formulas
 
 ## Iris Horizontal Ratio
 
@@ -1814,7 +1814,7 @@ ratio_v = (iris_y - top_eyelid_y) / (bottom_eyelid_y - top_eyelid_y)
 EAR = (||p2 - p6|| + ||p3 - p5||) / (2 × ||p1 - p4||)
 ```
 
-- Open eye: 0.20 – 0.35
+- Open eye: 0.20 - 0.35
 - Closed: < 0.20
 
 ## Euclidean Distance
@@ -1832,7 +1832,7 @@ error_cm = error_px × (screen_width_cm / screen_width_px)
 
 ---
 
-# Appendix D — Recommended File Structure
+# Appendix D: Recommended File Structure
 
 ```text
 OCULAR/
@@ -1896,16 +1896,17 @@ OCULAR/
 # Quick Reference: Development Order
 
 ```text
- 1. ✅ M1  — Camera pipeline                          [DONE]
- 2. 🔜 M2  — Install MediaPipe, build tracker.py       [NEXT]
- 3.    M3  — Build features.py, log features to CSV
- 4.    M4  — Build calibration.py, run 9-point calibration
- 5.    M5  — Train Ridge regression baseline, measure accuracy
- 6.    M6  — Implement adaptive calibration, compare with conventional
- 7.    M7  — Test robustness (lighting, users, distance)
- 8.    M8  — Add 1€ Filter, gaze cursor, dwell selection
- 9.    M9  — Run full evaluation experiments
-10.    M10 — Windows deployment and packaging
+ 1. M1: Camera pipeline                          [DONE]
+ 2. M2: Face and iris tracking (MediaPipe)        [DONE]
+ 3. M3: 11-D feature vector and solvePnP head pose [DONE]
+ 4. M4: Fullscreen visual calibration             [DONE]
+ 5. M5: Multi-model gaze regression (Ridge/RF)    [DONE]
+ 6. M6: Adaptive active-learning calibration      [DONE]
+ 7. M7: Robustness and metric conversions         [DONE]
+ 8. M8: One Euro filter, cursor, dwell, scroller  [DONE]
+ 9. M9: Benchmark and evaluation framework        [DONE]
+10. M10: Unified CLI and cross-platform packaging [DONE]
+11. M11: Performance profiler and study runner   [DONE]
 ```
 
 > **Remember:** Start simple. Increase complexity only when experimental

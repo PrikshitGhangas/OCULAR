@@ -39,7 +39,7 @@ To prove that by combining modern lightweight machine learning, rigorous feature
 
 Building an eye tracker with a standard RGB webcam presents several severe physical and mathematical challenges:
 
-1. **No Corneal Reflection (Glint):** Dedicated eye trackers shine infrared light into the eye to produce a sharp reflection off the cornea (PCCR — Pupil Center Corneal Reflection). The vector between the pupil center and the glint gives an immediate, lighting-invariant gaze vector. Commodity webcams rely on visible ambient light where reflections are chaotic, scattered, or non-existent.
+1. **No Corneal Reflection (Glint):** Dedicated eye trackers shine infrared light into the eye to produce a sharp reflection off the cornea (PCCR: Pupil Center Corneal Reflection). The vector between the pupil center and the glint gives an immediate, lighting-invariant gaze vector. Commodity webcams rely on visible ambient light where reflections are chaotic, scattered, or non-existent.
 2. **Head Movement Coupling:** When you turn your head to the right while continuing to look straight at the screen, your eyes naturally rotate to the left within their sockets. A naive model that only inspects eye images will think you are looking to the left. Eye position must be mathematically decoupled from 3D head rotation.
 3. **Anatomical Diversity:** No two human faces are identical. Inter-pupillary distance, eye socket depth, eyelid aperture, corneal curvature, and seated distance from the screen vary widely between users.
 4. **Natural Ocular Jitter (Micro-saccades):** Human eyes never remain perfectly stationary. Even when fixating on a point, the eye experiences involuntary micro-saccades, tremor, and drift. Feeding raw gaze predictions directly to a mouse cursor causes unusable, dizzying jitter.
@@ -107,7 +107,7 @@ In `src/ocular/interaction.py`, we designed interaction mechanics around how hum
 * **Dwell Selection:** Fixating within a 50-pixel radius for 600ms triggers a click. An on-screen progress indicator fills up to provide visual feedback.
 * **Refractory Cooldown:** After a dwell click fires, a 1000ms cooldown suppresses further activations, preventing unintended double clicks.
 * **Peripheral Gaze Scrolling:** Looking into the top 18% or bottom 18% of the screen scrolls documents proportionally, with a central dead-zone to allow reading without accidental scrolling.
-* **Blink Discrimination (`src/ocular/blink.py`):** Using Eye Aspect Ratio (EAR), the system distinguishes between involuntary natural blinks (lasting 60–180ms) and deliberate command blinks (held for >300ms) to trigger explicit user actions.
+* **Blink Discrimination (`src/ocular/blink.py`):** Using Eye Aspect Ratio (EAR), the system distinguishes between involuntary natural blinks (lasting 60-180ms) and deliberate command blinks (held for >300ms) to trigger explicit user actions.
 
 ---
 
@@ -132,7 +132,7 @@ src/ocular/
 
 ---
 
-### 3.1 `camera.py` — Hardware Abstraction Layer
+### 3.1 `camera.py`: Hardware Abstraction Layer
 * **Responsibility:** Captures video streams at 1280×720 @ 30 FPS using MJPG compression.
 * **Cross-Platform Design:**
   - On **Linux**, it optimizes camera driver exposure using `v4l2-ctl --set-ctrl=exposure_dynamic_framerate=0` to prevent framerate drops in low-light conditions, and defaults to `cv2.CAP_V4L2`.
@@ -141,7 +141,7 @@ src/ocular/
 
 ---
 
-### 3.2 `tracker.py` — Face, Eye, and Iris Tracking
+### 3.2 `tracker.py`: Face, Eye, and Iris Tracking
 * **Responsibility:** Ingests raw BGR frames, converts to RGB, and invokes `mediapipe.solutions.face_mesh.FaceMesh(refine_landmarks=True)`.
 * **Output:** Extracts 478 3D landmarks. Key landmark constants exposed:
   - `LEFT_IRIS_CENTER = 468`, `RIGHT_IRIS_CENTER = 473`
@@ -152,7 +152,7 @@ src/ocular/
 
 ---
 
-### 3.3 `features.py` — Numerical Feature Extraction
+### 3.3 `features.py`: Numerical Feature Extraction
 * **Responsibility:** Converts geometrical positions of landmarks into normalized scalar values independent of face size or camera distance.
 * **Mathematical Operations:**
   1. **Iris Ratios:**
@@ -168,7 +168,7 @@ src/ocular/
 
 ---
 
-### 3.4 `calibration.py` — Conventional Calibration
+### 3.4 `calibration.py`: Conventional Calibration
 * **Responsibility:** Manages the full-screen interactive calibration procedure.
 * **Process Flow:**
   1. Auto-detects monitor resolution (e.g., 1920×1080).
@@ -180,7 +180,7 @@ src/ocular/
 
 ---
 
-### 3.5 `adaptive.py` — Adaptive Calibration Engine
+### 3.5 `adaptive.py`: Adaptive Calibration Engine
 * **Responsibility:** Replaces static calibration grids with an intelligent active sampling loop.
 * **Sampling Heuristics:**
   - **Uncertainty-Driven:** Fits a Gaussian Process Regressor to past observations to find screen coordinates where prediction variance $\sigma^2(x, y)$ is highest.
@@ -190,7 +190,7 @@ src/ocular/
 
 ---
 
-### 3.6 `gaze.py` — Gaze Regression Modeling
+### 3.6 `gaze.py`: Gaze Regression Modeling
 * **Responsibility:** Maps the 11-D feature vector to continuous 2D screen coordinates $(X, Y)$.
 * **Architectures Supported:**
   - `ridge`: `StandardScaler` $\to$ `PolynomialFeatures(degree=2)` $\to$ `Ridge(alpha=5.0)`.
@@ -202,7 +202,7 @@ src/ocular/
 
 ---
 
-### 3.7 `filters.py` — HCI Signal Smoothing
+### 3.7 `filters.py`: HCI Signal Smoothing
 * **Responsibility:** Attenuates sensor noise and ocular tremor.
 * **One Euro Filter Algorithm:**
   $$\hat{x}_k = \alpha \cdot x_k + (1 - \alpha) \cdot \hat{x}_{k-1}$$
@@ -213,21 +213,21 @@ src/ocular/
 
 ---
 
-### 3.8 `blink.py` & `interaction.py` — Interaction & Control
-* **`BlinkDetector`:** Evaluates continuous frame durations of $\text{EAR} < 0.20$. Classifies events as natural blinks (2–6 frames), deliberate command blinks ($\ge 8$ frames), or unilateral winks.
+### 3.8 `blink.py` & `interaction.py`: Interaction & Control
+* **`BlinkDetector`:** Evaluates continuous frame durations of $\text{EAR} < 0.20$. Classifies events as natural blinks (2-6 frames), deliberate command blinks ($\ge 8$ frames), or unilateral winks.
 * **`GazeCursor`:** Converts predicted coordinates into OS mouse cursor events via PyAutoGUI. Includes target magnetism (snapping to UI buttons within 60px).
 * **`DwellDetector`:** Tracks fixation stability within a 50px boundary. Once fixation duration exceeds 600ms, it triggers a click and initiates a refractory period.
 * **`GazeScroller`:** Monitors vertical gaze into top/bottom screen margins and issues smooth scrolling events proportional to gaze depth.
 
 ---
 
-### 3.9 `evaluation.py` & `experiments/` — Quantitative Benchmark Harness
+### 3.9 `evaluation.py` & `experiments/`: Quantitative Benchmark Harness
 * **`experiments/compare_models.py`:** Runs cross-validation across Ridge, SVR, Random Forest, and MLP on calibration data, saving detailed metrics to `data/experiments/model_benchmark.json`.
 * **`experiments/calibration_experiment.py`:** Quantitatively compares Conventional vs. Adaptive calibration in terms of sample count, time, and spatial accuracy.
 
 ---
 
-### 3.10 `main.py` — Unified CLI Orchestrator
+### 3.10 `main.py`: Unified CLI Orchestrator
 * Single, robust command-line entry point supporting 5 subcommands:
   - `stream`: Real-time diagnostic tracking HUD.
   - `calibrate`: Interactive full-screen calibration.
@@ -375,17 +375,17 @@ python experiments/calibration_experiment.py
 
 | Requirement / Milestone | Status | Details |
 |:---|:---:|:---|
-| **M1: Webcam Pipeline** | ✅ Complete | Cross-platform camera abstraction (Linux V4L2 & Windows DirectShow) |
-| **M2: Face & Iris Tracking** | ✅ Complete | MediaPipe Face Mesh with 478 3D landmarks and sub-pixel iris centers |
-| **M3: Feature Extraction** | ✅ Complete | 11-D vector: Iris ratios, EAR openness, eye aspect, solvePnP head pose |
-| **M4: Calibration System** | ✅ Complete | Full-screen animated UI, blink filtering, outlier removal, `.npz` storage |
-| **M5: Gaze Regression** | ✅ Complete | Multi-model engine (Ridge + Poly, SVR, Random Forest, MLP) with LOOCV |
-| **M6: Adaptive Calibration** | ✅ Complete | Active learning (Uncertainty, Error, Hybrid), online SGD refiner |
-| **M7: Robustness & Experiments**| ✅ Complete | Automated testing scripts, cross-validation metrics, degree conversion |
-| **M8: Interaction Mechanics** | ✅ Complete | 1€ Filter, GazeCursor, DwellDetector, GazeScroller, BlinkDetector |
-| **M9: Evaluation Framework** | ✅ Complete | Comprehensive metrics logging and JSON experimental exports |
-| **M10: Architecture & Windows** | ✅ Complete | OS-independent code separation, DirectShow support, unified CLI |
-| **Unit & Integration Tests** | ✅ Complete | 14 tests passing across all modules in `tests/` |
+| **M1: Webcam Pipeline** | Complete | Cross-platform camera abstraction (Linux V4L2 & Windows DirectShow) |
+| **M2: Face & Iris Tracking** | Complete | MediaPipe Face Mesh with 478 3D landmarks and sub-pixel iris centers |
+| **M3: Feature Extraction** | Complete | 11-D vector: Iris ratios, EAR openness, eye aspect, solvePnP head pose |
+| **M4: Calibration System** | Complete | Full-screen animated UI, blink filtering, outlier removal, `.npz` storage |
+| **M5: Gaze Regression** | Complete | Multi-model engine (Ridge + Poly, SVR, Random Forest, MLP) with LOOCV |
+| **M6: Adaptive Calibration** | Complete | Active learning (Uncertainty, Error, Hybrid), online SGD refiner |
+| **M7: Robustness & Experiments**| Complete | Automated testing scripts, cross-validation metrics, degree conversion |
+| **M8: Interaction Mechanics** | Complete | 1€ Filter, GazeCursor, DwellDetector, GazeScroller, BlinkDetector |
+| **M9: Evaluation Framework** | Complete | Comprehensive metrics logging and JSON experimental exports |
+| **M10: Architecture & Windows** | Complete | OS-independent code separation, DirectShow support, unified CLI |
+| **Unit & Integration Tests** | Complete | 59 tests passing across all modules in `tests/` |
 
 ---
 *Document generated as part of the OCULAR Project Core Documentation.*

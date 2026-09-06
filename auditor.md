@@ -14,7 +14,7 @@ architecture.
 Do not ask me for approval for ordinary engineering decisions. Make reasonable
 decisions yourself and document important ones.
 
-# ================================================== PHASE 0 — UNDERSTAND THE PROJECT
+# ================================================== PHASE 0: UNDERSTAND THE PROJECT
 
 Before changing anything:
 
@@ -57,7 +57,7 @@ Record:
 
 Do not assume existing documentation is correct.
 
-# ================================================== PHASE 1 — ACT AS AN ATTACKER / ADVERSARIAL REVIEWER
+# ================================================== PHASE 1: ACT AS AN ATTACKER / ADVERSARIAL REVIEWER
 
 Now pretend you are an extremely hostile reviewer whose goal is to break this
 project.
@@ -196,7 +196,7 @@ DOCUMENTATION
 - missing architecture documentation
 - missing examples
 
-# ================================================== PHASE 2 — TRY TO BREAK IT
+# ================================================== PHASE 2: TRY TO BREAK IT
 
 Do not limit yourself to static inspection.
 
@@ -230,9 +230,9 @@ For every discovered issue, determine:
 
 Do not fix only symptoms when the root cause can be addressed.
 
-# ================================================== PHASE 3 — SCORE THE PROJECT
+# ================================================== PHASE 3: SCORE THE PROJECT
 
-Create a rigorous scorecard from 0–10 for:
+Create a rigorous scorecard from 0-10 for:
 
 - Correctness
 - Reliability
@@ -260,7 +260,7 @@ Create a prioritized issue list:
 P0 = catastrophic / blocking P1 = major P2 = important P3 = improvement P4 =
 polish
 
-# ================================================== PHASE 4 — FIX EVERYTHING REASONABLY FIXABLE
+# ================================================== PHASE 4: FIX EVERYTHING REASONABLY FIXABLE
 
 Now stop being the reviewer and become the implementation team.
 
@@ -294,7 +294,7 @@ Do not weaken tests just because the implementation fails them.
 Do not remove functionality unless it is demonstrably harmful or obsolete; if
 you believe functionality should be removed, document the reasoning.
 
-# ================================================== PHASE 5 — SECOND RED-TEAM PASS
+# ================================================== PHASE 5: SECOND RED-TEAM PASS
 
 After implementing the fixes, attack the project AGAIN.
 
@@ -316,7 +316,7 @@ Fix what you find.
 Repeat this audit/fix cycle until additional iterations produce no significant
 findings.
 
-# ================================================== PHASE 6 — PORTABILITY: WINDOWS + macOS + LINUX
+# ================================================== PHASE 6: PORTABILITY: WINDOWS + macOS + LINUX
 
 The project must be portable.
 
@@ -382,7 +382,7 @@ If appropriate, add:
 
 Do not claim "works everywhere" unless it has actually been validated.
 
-# ================================================== PHASE 7 — TESTING
+# ================================================== PHASE 7: TESTING
 
 Build a serious test strategy.
 
@@ -409,7 +409,7 @@ Run everything.
 
 Fix everything that fails.
 
-# ================================================== PHASE 8 — PERFORMANCE
+# ================================================== PHASE 8: PERFORMANCE
 
 Profile or otherwise measure important paths rather than blindly optimizing.
 
@@ -427,7 +427,7 @@ Only make performance changes that have a defensible benefit.
 
 Add benchmarks where appropriate.
 
-# ================================================== PHASE 9 — DOCUMENTATION AND OPERABILITY
+# ================================================== PHASE 9: DOCUMENTATION AND OPERABILITY
 
 Bring documentation up to the actual state of the project.
 
@@ -454,7 +454,7 @@ Document:
 
 Do not document functionality that does not actually work.
 
-# ================================================== PHASE 10 — FINAL VALIDATION
+# ================================================== PHASE 10: FINAL VALIDATION
 
 Perform a clean-environment validation.
 

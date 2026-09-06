@@ -17,7 +17,7 @@ This report presents the experimental methodology, quantitative findings, and co
 * **Capture Device:** Standard 720p USB webcam (1280×720 @ 30 FPS, MJPG stream).
 * **Display Device:** 24-inch 16:9 monitor (1920×1080 native resolution, 53.1 cm width).
 * **User Distance:** Approximately 60.0 cm from screen surface to ocular plane.
-* **Illumination:** Diffuse indoor lighting (300–450 lux), no active infrared illumination.
+* **Illumination:** Diffuse indoor lighting (300 to 450 lux), no active infrared illumination.
 * **Tracking Subsystem:** MediaPipe FaceLandmarker with refined iris tracking (478 3D landmarks).
 
 ### 1.2 Evaluation Metrics
@@ -106,7 +106,7 @@ The One Euro Filter dynamically shifts its cutoff frequency from $1.0\text{ Hz}$
 ### 4.2 Dwell Selection & Gesture Reliability
 * **Dwell Success Rate:** In trials with a 50px target radius and 600ms threshold, dwell selection achieved an **88.5% first-attempt success rate**.
 * **False Activation Mitigation:** The 1000ms refractory cooldown completely eliminated accidental double clicks.
-* **Blink Discrimination:** Testing with `BlinkDetector` demonstrated 100% separation between involuntary blinks (60–180ms) and deliberate command blinks (>300ms).
+* **Blink Discrimination:** Testing with `BlinkDetector` demonstrated 100% separation between involuntary blinks (60 to 180 ms) and deliberate command blinks (>300ms).
 
 ---
 

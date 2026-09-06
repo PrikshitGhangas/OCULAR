@@ -16,6 +16,7 @@ A comprehensive developer reference documenting all classes, methods, arguments,
 9. [Blink Detection (`ocular.BlinkDetector`)](#9-blink-detection-ocularblinkdetector)
 10. [Interaction Controller (`ocular.InteractionController`)](#10-interaction-controller-ocularinteractioncontroller)
 11. [Evaluation Framework (`ocular.EvaluationFramework`)](#11-evaluation-framework-ocularevaluationframework)
+12. [Performance Profiler (`ocular.PerformanceProfiler`)](#12-performance-profiler-ocularperformanceprofiler)
 
 ---
 
@@ -225,8 +226,8 @@ BlinkDetector(ear_threshold=0.20, natural_min_frames=2, deliberate_min_frames=8,
 * `update(left_ear: float, right_ear: float) -> str`:  
   Processes current frame EAR. Returns:
   - `"NONE"`
-  - `"NATURAL_BLINK"` (involuntary blink: 2–7 frames)
-  - `"DELIBERATE_BLINK"` (held blink: $\ge 8$ frames)
+  - `"NATURAL_BLINK"` (involuntary blink: 2 to 7 frames)
+  - `"DELIBERATE_BLINK"` (held blink: 8 or more frames)
   - `"LEFT_WINK"` / `"RIGHT_WINK"`
 * `is_blinking(left_ear, right_ear) -> bool`: Returns `True` while eyelids are closed.
 
@@ -272,3 +273,27 @@ from ocular import EvaluationFramework
   Computes sample reduction ratio, time savings, and accuracy trade-offs.
 * `save_experiment_results(filepath: str, report_data: dict) -> None`:  
   Saves evaluation metrics to JSON.
+
+---
+
+## 12. Performance Profiler (`ocular.PerformanceProfiler`)
+
+```python
+from ocular import PerformanceProfiler
+```
+
+### Constructor
+```python
+PerformanceProfiler(window_size=100)
+```
+
+### Methods
+* `start(stage_name: str) -> None`: Begins timing for the specified pipeline stage.
+* `stop(stage_name: str) -> float`: Ends timing and records duration in milliseconds.
+* `measure(stage_name: str)`: Returns a context manager (`with profiler.measure("stage"):`) that times the enclosed block.
+* `get_stats(stage_name: str) -> dict`: Returns `mean_ms`, `min_ms`, `max_ms`, and sample count for a stage.
+* `get_all_stats() -> dict`: Returns summary statistics across all monitored stages.
+* `get_total_ms() -> float`: Returns cumulative latency across stages.
+* `get_fps() -> float`: Returns estimated throughput (frames per second) based on total latency.
+* `report() -> None`: Prints a formatted breakdown of stage durations and overall FPS.
+* `reset() -> None`: Clears all recorded timing samples.

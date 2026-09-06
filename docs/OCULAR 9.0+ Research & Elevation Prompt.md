@@ -1,6 +1,6 @@
 # ROLE
 
-Act as a senior research scientist, computer-vision researcher, machine-learning engineer, HCI researcher, and software-architecture reviewer conducting a deep technical research audit of the project **OCULAR — Real-Time Ocular Tracking and Gaze-Aware Interaction Framework**.
+Act as a senior research scientist, computer-vision researcher, machine-learning engineer, HCI researcher, and software-architecture reviewer conducting a deep technical research audit of the project **OCULAR: Real-Time Ocular Tracking and Gaze-Aware Interaction Framework**.
 
 Your objective is NOT to praise the project or simply suggest additional features.
 
@@ -534,7 +534,7 @@ Use the audit report to determine how to move:
 - Security: 6 → 9+
 - Portability: 7 → 9+
 - Observability: 5 → 9+
-- Production Readiness: 6 → 8–9+
+- Production Readiness: 6 → 8-9+
 
 Investigate:
 
@@ -755,10 +755,10 @@ The strongest defensible contribution OCULAR can claim.
 ## 14. 9.0+ Implementation Roadmap
 Organize into:
 
-### Phase A — Highest-impact research improvements
-### Phase B — Experimental validation
-### Phase C — Engineering hardening
-### Phase D — Documentation and presentation
+### Phase A: Highest-impact research improvements
+### Phase B: Experimental validation
+### Phase C: Engineering hardening
+### Phase D: Documentation and presentation
 
 Include dependencies between tasks.
 
